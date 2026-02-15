@@ -124,10 +124,19 @@ class BaziCalculator
         // Get Lichun of current year
         $lichun = CalendarDataRepository::getLichun($year);
 
-        // If birth is before Lichun, use previous year's ganzhi
+        // If Lichun data available and birth is before Lichun, use previous year's ganzhi
         if ($lichun && $birthDateTime < $lichun)
         {
             $year--;
+        }
+        elseif ($lichun === null)
+        {
+            // Fallback: approximate Lichun as Feb 4
+            $approxLichun = new DateTime($year . '-02-04 00:00:00', new \DateTimeZone('UTC'));
+            if ($birthDateTime < $approxLichun)
+            {
+                $year--;
+            }
         }
 
         $ganzhi = GanzhiHelper::getYearGanzhi($year);
@@ -265,6 +274,12 @@ class BaziCalculator
         else
         {
             $referenceJieQi = CalendarDataRepository::getPreviousJieQi($birthDateTime);
+        }
+        
+        // If no Jie Qi data available, use approximate fallback
+        if ($referenceJieQi === null)
+        {
+            $referenceJieQi = $this->getApproximateJieQi($birthDateTime, $isForward);
         }
         
         // Calculate starting age (3 days = 1 year)
@@ -543,5 +558,96 @@ class BaziCalculator
         ];
         
         return $postHorseTable[$yearBranch['chinese']] ?? null;
+    }
+
+    /**
+     * Get approximate Jie Qi when calendar data is not available
+     * Uses simple month-based approximation
+     *
+     * @param   DateTime  $birthDateTime  Birth date/time
+     * @param   boolean   $isForward      Direction (true = forward, false = backward)
+     *
+     * @return  array  Approximate Jie Qi data
+     *
+     * @since   1.0.0
+     */
+    protected function getApproximateJieQi(DateTime $birthDateTime, bool $isForward): array
+    {
+        $year = (int) $birthDateTime->format('Y');
+        $month = (int) $birthDateTime->format('n');
+        $day = (int) $birthDateTime->format('j');
+        
+        // Approximate Jie Qi dates (day of month)
+        $jieqiDates = [
+            1  => ['name' => 'lichun', 'name_zh' => '立春', 'month' => 2, 'day' => 4],
+            2  => ['name' => 'jingzhe', 'name_zh' => '惊蛰', 'month' => 3, 'day' => 6],
+            3  => ['name' => 'qingming', 'name_zh' => '清明', 'month' => 4, 'day' => 5],
+            4  => ['name' => 'lixia', 'name_zh' => '立夏', 'month' => 5, 'day' => 6],
+            5  => ['name' => 'mangzhong', 'name_zh' => '芒种', 'month' => 6, 'day' => 6],
+            6  => ['name' => 'xiaoshu', 'name_zh' => '小暑', 'month' => 7, 'day' => 7],
+            7  => ['name' => 'liqiu', 'name_zh' => '立秋', 'month' => 8, 'day' => 8],
+            8  => ['name' => 'bailu', 'name_zh' => '白露', 'month' => 9, 'day' => 8],
+            9  => ['name' => 'hanlu', 'name_zh' => '寒露', 'month' => 10, 'day' => 8],
+            10 => ['name' => 'lidong', 'name_zh' => '立冬', 'month' => 11, 'day' => 7],
+            11 => ['name' => 'daxue', 'name_zh' => '大雪', 'month' => 12, 'day' => 7],
+            12 => ['name' => 'xiaohan', 'name_zh' => '小寒', 'month' => 1, 'day' => 6],
+        ];
+        
+        if ($isForward)
+        {
+            // Find next Jie Qi
+            foreach ($jieqiDates as $idx => $jieqi)
+            {
+                $jieqiDate = new DateTime(
+                    sprintf('%d-%02d-%02d 00:00:00', $year, $jieqi['month'], $jieqi['day']),
+                    new \DateTimeZone('UTC')
+                );
+                
+                if ($jieqiDate > $birthDateTime)
+                {
+                    return [
+                        'name' => $jieqi['name'],
+                        'name_zh' => $jieqi['name_zh'],
+                        'timestamp' => $jieqiDate,
+                    ];
+                }
+            }
+            
+            // If no future Jie Qi in this year, return next year's first
+            $nextYear = $year + 1;
+            return [
+                'name' => 'lichun',
+                'name_zh' => '立春',
+                'timestamp' => new DateTime($nextYear . '-02-04 00:00:00', new \DateTimeZone('UTC')),
+            ];
+        }
+        else
+        {
+            // Find previous Jie Qi
+            foreach (array_reverse($jieqiDates, true) as $idx => $jieqi)
+            {
+                $jieqiDate = new DateTime(
+                    sprintf('%d-%02d-%02d 00:00:00', $year, $jieqi['month'], $jieqi['day']),
+                    new \DateTimeZone('UTC')
+                );
+                
+                if ($jieqiDate < $birthDateTime)
+                {
+                    return [
+                        'name' => $jieqi['name'],
+                        'name_zh' => $jieqi['name_zh'],
+                        'timestamp' => $jieqiDate,
+                    ];
+                }
+            }
+            
+            // If no previous Jie Qi in this year, return previous year's last
+            $prevYear = $year - 1;
+            return [
+                'name' => 'dahan',
+                'name_zh' => '大寒',
+                'timestamp' => new DateTime($prevYear . '-01-20 00:00:00', new \DateTimeZone('UTC')),
+            ];
+        }
     }
 }
