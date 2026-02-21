@@ -1,0 +1,231 @@
+<?xml version="1.0" encoding="utf-8"?>
+<extension type="component" method="upgrade">
+    <name>COM_BAZI</name>
+    <author>Yutang2049</author>
+    <creationDate>2026-02</creationDate>
+    <copyright>Copyright (C) 2026</copyright>
+    <license>GNU General Public License version 2 or later</license>
+    <authorEmail></authorEmail>
+    <authorUrl></authorUrl>
+    <version>1.0.0</version>
+    <description>COM_BAZI_XML_DESCRIPTION</description>
+    <namespace path="src">Yutang\Component\Bazi</namespace>
+
+    <install>
+        <sql>
+            <file driver="mysql" charset="utf8mb4">sql/install/mysql.sql</file>
+        </sql>
+    </install>
+
+    <uninstall>
+        <sql>
+            <file driver="mysql" charset="utf8mb4">sql/uninstall/mysql.sql</file>
+        </sql>
+    </uninstall>
+
+    <update>
+        <schemas>
+            <schemapath type="mysql">sql/updates</schemapath>
+        </schemas>
+    </update>
+
+    <files folder="site">
+        <folder>language</folder>
+        <folder>src</folder>
+        <folder>tmpl</folder>
+    </files>
+
+    <administration>
+        <menu>COM_BAZI</menu>
+        <submenu>
+            <menu link="option=com_bazi&amp;view=charts">COM_BAZI_CHARTS</menu>
+            <menu link="option=com_bazi&amp;view=readings">COM_BAZI_READINGS</menu>
+        </submenu>
+
+        <files folder="admin">
+            <folder>language</folder>
+            <folder>services</folder>
+            <folder>sql</folder>
+            <folder>src</folder>
+            <folder>tmpl</folder>
+        </files>
+    </administration>
+
+    <config>
+        <fields name="params">
+            <fieldset name="algorithm" label="COM_BAZI_CONFIG_ALGORITHM_LABEL" description="COM_BAZI_CONFIG_ALGORITHM_DESC">
+                <field
+                    name="year_min"
+                    type="number"
+                    label="COM_BAZI_CONFIG_YEAR_MIN_LABEL"
+                    description="COM_BAZI_CONFIG_YEAR_MIN_DESC"
+                    default="1900"
+                    min="1900"
+                    max="2050"
+                />
+                <field
+                    name="year_max"
+                    type="number"
+                    label="COM_BAZI_CONFIG_YEAR_MAX_LABEL"
+                    description="COM_BAZI_CONFIG_YEAR_MAX_DESC"
+                    default="2050"
+                    min="1900"
+                    max="2050"
+                />
+                <field
+                    name="liunian_range"
+                    type="number"
+                    label="COM_BAZI_CONFIG_LIUNIAN_RANGE_LABEL"
+                    description="COM_BAZI_CONFIG_LIUNIAN_RANGE_DESC"
+                    default="5"
+                    min="1"
+                    max="50"
+                />
+                <field
+                    name="true_solar_time"
+                    type="radio"
+                    label="COM_BAZI_CONFIG_TRUE_SOLAR_TIME_LABEL"
+                    description="COM_BAZI_CONFIG_TRUE_SOLAR_TIME_DESC"
+                    default="1"
+                    class="btn-group btn-group-yesno"
+                >
+                    <option value="1">JYES</option>
+                    <option value="0">JNO</option>
+                </field>
+                <field
+                    name="longitude_correction"
+                    type="radio"
+                    label="COM_BAZI_CONFIG_LONGITUDE_CORRECTION_LABEL"
+                    description="COM_BAZI_CONFIG_LONGITUDE_CORRECTION_DESC"
+                    default="1"
+                    class="btn-group btn-group-yesno"
+                    showon="true_solar_time:1"
+                >
+                    <option value="1">JYES</option>
+                    <option value="0">JNO</option>
+                </field>
+                <field
+                    name="eot_correction"
+                    type="radio"
+                    label="COM_BAZI_CONFIG_EOT_CORRECTION_LABEL"
+                    description="COM_BAZI_CONFIG_EOT_CORRECTION_DESC"
+                    default="1"
+                    class="btn-group btn-group-yesno"
+                    showon="true_solar_time:1"
+                >
+                    <option value="1">JYES</option>
+                    <option value="0">JNO</option>
+                </field>
+            </fieldset>
+
+            <fieldset name="antispam" label="COM_BAZI_CONFIG_ANTISPAM_LABEL" description="COM_BAZI_CONFIG_ANTISPAM_DESC">
+                <field
+                    name="honeypot_enabled"
+                    type="radio"
+                    label="COM_BAZI_CONFIG_HONEYPOT_ENABLED_LABEL"
+                    description="COM_BAZI_CONFIG_HONEYPOT_ENABLED_DESC"
+                    default="1"
+                    class="btn-group btn-group-yesno"
+                >
+                    <option value="1">JYES</option>
+                    <option value="0">JNO</option>
+                </field>
+                <field
+                    name="honeypot_field_name"
+                    type="text"
+                    label="COM_BAZI_CONFIG_HONEYPOT_FIELD_NAME_LABEL"
+                    description="COM_BAZI_CONFIG_HONEYPOT_FIELD_NAME_DESC"
+                    default="website"
+                    showon="honeypot_enabled:1"
+                />
+                <field
+                    name="rate_limit_window"
+                    type="number"
+                    label="COM_BAZI_CONFIG_RATE_LIMIT_WINDOW_LABEL"
+                    description="COM_BAZI_CONFIG_RATE_LIMIT_WINDOW_DESC"
+                    default="3600"
+                    min="60"
+                    max="86400"
+                />
+                <field
+                    name="rate_limit_guest_max"
+                    type="number"
+                    label="COM_BAZI_CONFIG_RATE_LIMIT_GUEST_MAX_LABEL"
+                    description="COM_BAZI_CONFIG_RATE_LIMIT_GUEST_MAX_DESC"
+                    default="5"
+                    min="1"
+                    max="100"
+                />
+                <field
+                    name="rate_limit_user_max"
+                    type="number"
+                    label="COM_BAZI_CONFIG_RATE_LIMIT_USER_MAX_LABEL"
+                    description="COM_BAZI_CONFIG_RATE_LIMIT_USER_MAX_DESC"
+                    default="20"
+                    min="1"
+                    max="1000"
+                />
+                <field
+                    name="captcha_enabled"
+                    type="radio"
+                    label="COM_BAZI_CONFIG_CAPTCHA_ENABLED_LABEL"
+                    description="COM_BAZI_CONFIG_CAPTCHA_ENABLED_DESC"
+                    default="0"
+                    class="btn-group btn-group-yesno"
+                >
+                    <option value="1">JYES</option>
+                    <option value="0">JNO</option>
+                </field>
+            </fieldset>
+
+            <fieldset name="gpt" label="COM_BAZI_CONFIG_GPT_LABEL" description="COM_BAZI_CONFIG_GPT_DESC">
+                <field
+                    name="gpt_api_base"
+                    type="url"
+                    label="COM_BAZI_CONFIG_GPT_API_BASE_LABEL"
+                    description="COM_BAZI_CONFIG_GPT_API_BASE_DESC"
+                    default="https://api.openai.com/v1"
+                />
+                <field
+                    name="gpt_api_key"
+                    type="text"
+                    label="COM_BAZI_CONFIG_GPT_API_KEY_LABEL"
+                    description="COM_BAZI_CONFIG_GPT_API_KEY_DESC"
+                    default=""
+                />
+                <field
+                    name="gpt_model"
+                    type="text"
+                    label="COM_BAZI_CONFIG_GPT_MODEL_LABEL"
+                    description="COM_BAZI_CONFIG_GPT_MODEL_DESC"
+                    default="gpt-4"
+                />
+            </fieldset>
+
+            <fieldset name="permissions" label="JCONFIG_PERMISSIONS_LABEL" description="JCONFIG_PERMISSIONS_DESC">
+                <field
+                    name="rules"
+                    type="rules"
+                    label="JCONFIG_PERMISSIONS_LABEL"
+                    validate="rules"
+                    filter="rules"
+                    component="com_bazi"
+                    section="component"
+                />
+            </fieldset>
+        </fields>
+    </config>
+
+    <access>
+        <section name="component">
+            <action name="core.admin" title="JACTION_ADMIN" description="JACTION_ADMIN_COMPONENT_DESC"/>
+            <action name="core.manage" title="JACTION_MANAGE" description="COM_BAZI_ACCESS_MANAGE_DESC"/>
+            <action name="bazi.chart.create" title="COM_BAZI_ACCESS_CHART_CREATE" description="COM_BAZI_ACCESS_CHART_CREATE_DESC"/>
+            <action name="bazi.chart.view.own" title="COM_BAZI_ACCESS_CHART_VIEW_OWN" description="COM_BAZI_ACCESS_CHART_VIEW_OWN_DESC"/>
+            <action name="bazi.chart.view.all" title="COM_BAZI_ACCESS_CHART_VIEW_ALL" description="COM_BAZI_ACCESS_CHART_VIEW_ALL_DESC"/>
+            <action name="bazi.reading.view" title="COM_BAZI_ACCESS_READING_VIEW" description="COM_BAZI_ACCESS_READING_VIEW_DESC"/>
+            <action name="bazi.reading.generate" title="COM_BAZI_ACCESS_READING_GENERATE" description="COM_BAZI_ACCESS_READING_GENERATE_DESC"/>
+            <action name="bazi.settings.edit" title="COM_BAZI_ACCESS_SETTINGS_EDIT" description="COM_BAZI_ACCESS_SETTINGS_EDIT_DESC"/>
+        </section>
+    </access>
+</extension>
