@@ -271,8 +271,7 @@ class BaziHelper
         $adjYear = ($ts < $lichun) ? $year - 1 : $year;
 
         $stemIdx   = ($adjYear + 6) % 10;
-        $branchIdx = (($adjYear - 1984 % 12) + 1200) % 12;
-        // Simpler: (year + 8) % 12 maps year 1984 → index 8 (子=Rat year 1984)
+        // (adjYear - 4) % 12: maps 1984→0(子=Rat), 1985→1(丑=Ox), etc.
         $branchIdx = (($adjYear - 4) % 12 + 12) % 12;
 
         return self::buildPillar($stemIdx, $branchIdx);
