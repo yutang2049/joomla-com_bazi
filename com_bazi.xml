@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<extension type="component" version="3.9" method="install">
+    <name>COM_BAZI</name>
+    <creationDate>2024-01-01</creationDate>
+    <author>yutang2049</author>
+    <authorEmail></authorEmail>
+    <authorUrl>https://github.com/yutang2049/joomla-com_bazi</authorUrl>
+    <copyright>Copyright (C) 2024 yutang2049. All rights reserved.</copyright>
+    <license>GNU General Public License version 2 or later</license>
+    <version>1.0.0</version>
+    <description>COM_BAZI_XML_DESCRIPTION</description>
+
+    <files folder="components/com_bazi">
+        <filename>com_bazi.php</filename>
+        <filename>controller.php</filename>
+        <folder>models</folder>
+        <folder>views</folder>
+        <folder>helpers</folder>
+    </files>
+
+    <administration>
+        <files folder="administrator/components/com_bazi">
+            <filename>com_bazi.php</filename>
+        </files>
+    </administration>
+
+    <languages folder="language">
+        <language tag="en-GB">en-GB/en-GB.com_bazi.ini</language>
+        <language tag="zh-CN">zh-CN/zh-CN.com_bazi.ini</language>
+    </languages>
+</extension>
